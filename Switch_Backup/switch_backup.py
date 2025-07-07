@@ -1,13 +1,14 @@
 import logging
 import pandas as pd
 from netmiko import ConnectHandler
-import datetime
+import datetime, paramiko
 # from netmiko import redispatch
 logging.basicConfig(filename='/data/chendewu/projects/netmiko/logs/backup_logs/netmiko_log.txt', level=logging.DEBUG)
 import os, sys
+import move_file, sync_nas
 os.chdir(sys.path[0])
 
-def Get_Device_Info(filename):
+def get_device_info(filename):
     df = pd.read_excel(filename)
     items = df.to_dict(orient='records')
     dev_infos = []
@@ -18,7 +19,7 @@ def Get_Device_Info(filename):
         dev_infos.append((dev, backup_cmd))
     return dev_infos
 
-def Network_Device_Backup(dev, cmd='dis cur'):
+def network_device_backup(dev, cmd='dis cur'):
     with ConnectHandler(**dev) as conn:
         time = datetime.datetime.now().strftime('%Y%m%d%H%M')
         output = conn.send_command(command_string = cmd, delay_factor=3)
@@ -35,12 +36,16 @@ def Network_Device_Backup(dev, cmd='dis cur'):
         # with open('/data/chendewu/projects/netmiko/logs/backup_logs/session_log.txt', mode='w', encoding='utf8') as f:
         #     net_connect.session_log = f
 
-def Batch_Backup(inventory_file = '/data/chendewu/projects/netmiko/Device_Inventory/device_inventory.xlsx'):
-    dev_infos = Get_Device_Info(inventory_file)
+def batch_backup(inventory_file):
+    dev_infos = get_device_info(inventory_file)
     for dev_info in dev_infos:
         dev = dev_info[0]
         cmd = dev_info[1]
-        Network_Device_Backup(dev, cmd)
+        network_device_backup(dev, cmd)
 
 if __name__ == '__main__':
-    Batch_Backup()
+    batch_backup(inventory_file='/data/chendewu/projects/netmiko/Device_Inventory/device_inventory.xlsx')
+    move_file.mv_file()
+    sftp_info = sync_nas.get_info(filename='/data/chendewu/projects/netmiko/Device_Inventory/sftp_info.json')
+    sync_nas.sftp_put(sftp_info)
+    

@@ -6,14 +6,14 @@ time = datetime.datetime.now().strftime('%Y%m%d')
 s_pth = "/data/chendewu/projects/netmiko/Backups/"
 d_path = "/data/chendewu/projects/netmiko/Backups/{}".format(time)
 
-def create_folder(dest_path):
+def create_folder(dest_path=d_path):
     if not os.path.exists(dest_path):
         os.makedirs(dest_path)
         print("the folder have been created")
     else:
         print("the folder have existed")
 
-def mv_file(source_path, dest_path):
+def mv_file(source_path=s_pth, dest_path=d_path):
     create_folder(dest_path)
     source = Path(source_path)
     for file in source.glob("*.txt".format(time)):
@@ -21,5 +21,5 @@ def mv_file(source_path, dest_path):
         print("{} have moved to the new folder".format(file))
 
 if __name__ == '__main__':
-    mv_file(s_pth, d_path)
+    mv_file()
 
