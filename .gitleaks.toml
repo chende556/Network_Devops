@@ -1,0 +1,22 @@
+[extend]
+# 继承 gitleaks 默认规则
+useDefault = true
+
+# 自定义规则：检测 Django settings 中的敏感字段
+[[rules]]
+id = "django-secret-key"
+description = "Django Secret Key"
+regex = '''SECRET_KEY\s*=\s*['"][^'"]+['"]'''
+keywords = ["SECRET_KEY"]
+
+[[rules]]
+id = "hardcoded-password"
+description = "Hardcoded password in config"
+regex = '''(?i)['"]PASSWORD['"]\s*:\s*['"][^'"]+['"]'''
+keywords = ["PASSWORD"]
+
+[[rules]]
+id = "generic-password-assignment"
+description = "Password assignment"
+regex = '''(?i)(?:password|passwd|pwd)\s*=\s*['"][^'"]{8,}['"]'''
+keywords = ["password", "passwd", "pwd"]

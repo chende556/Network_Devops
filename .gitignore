@@ -4,3 +4,6 @@ Device_Inventory/
 Backups/
 logs/
 gitignore/
+inventory/
+nornir/
+.env
